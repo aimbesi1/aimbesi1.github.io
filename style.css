@@ -1,0 +1,81 @@
+body {
+	font-family: sans-serif;
+	background-image: url("blue-wallpaper.png");
+	margin: 4cm;
+}
+
+span {
+	font-weight: bold;
+	color: #ff0000;
+}
+
+h2, h3 {
+	font-style: italic;
+}
+
+table {
+	margin: auto;
+	width: 55%;
+	border: 1px solid #000000;
+	background-color:#f0f8ff;
+	text-align: center;
+}
+
+caption {
+	margin-bottom: 10px;
+	font-size: 16pt;
+	font-weight: bold;
+	font-style: italic;
+}
+
+th {
+	font-weight: 500;
+}
+
+td {
+	width: 50%;
+}
+
+tr:nth-child(even) {
+	background-color: #cecfee8a;
+}
+
+a:hover {
+	color: #43fc8a;
+  }
+  
+div {
+	width: 25%;
+	border: 10px dotted #4d7298;
+	font-style: italic;
+	color: #4d7298;
+	margin: auto;
+	padding: 1cm;
+	text-align: center;
+}
+
+h2.quote {
+	margin-top: 5px;
+}
+
+span.quote {
+	margin-left: 2cm;
+	color: #4d7298;
+}
+
+img.profile {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 200px;
+	height: 299px;
+	border: 3px solid #4d7298;
+}
+
+h2.profile {
+	text-align: center;
+}
+
+li {
+	margin: 10px;
+}
