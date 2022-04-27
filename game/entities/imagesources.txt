@@ -1,0 +1,100 @@
+All images except for ship2 were made by Tony Imbesi using Fire Alpaca
+
+ship2 was made by Nabeeha Ashfaq using Fire Alpaca
+
+goal, goal2, and goal3 were modified from ship2 by Tony Imbesi
+
+File name: cannon.png
+What is it: sprite for unused cannon enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: copter.png
+What is it: sprite for unused copter enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: cone.png
+What is it: spritesheet for "cone" enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: supercone.png
+What is it: spritesheet for "supercone" enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: jumpster.png
+What is it: spritesheet for "jumpster" enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: spikes.png
+What is it: sprite for spikes hazard
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: funbat.png
+What is it: spritesheet for "funbat" enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: comet_backup.png
+What is it: placeholder spritesheet for "comet" hazard
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: comet_backup.png
+What is it: spritesheet for "comet" hazard
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Nabeeha Ashfaq
+
+File name: comet.png
+What is it: spritesheet for "comet" hazard
+Where it comes from: created for this project with Fire Alpaca using comet_backup2 by Nabeeha as reference
+Who made it: Tony Imbesi
+
+File name: laserbeam.png, laserdown.png
+What are they: sprites for horizontal and vertical lasers
+Where they come from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: laserCannon.png
+What is it: spritesheet for laser cannon enemy
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: dKickParticle.png
+What is it: particle effect sprite to indicate availability of "dropkick" special move
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: warning.png, warning2.png, warning2a.png, warning2a.mdp
+What are they: sprites indicating hazardous areas
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: warning3.png, warning3.mdp
+What are they: sprites indicating an off-screen charging laser
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: ship2.png
+What is it: first draft for goal UFO object
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Nabeeha Ashfaq
+
+File name: goal.mdp, goal.png
+What is it: spritesheet for goal UFO
+Where it comes from: created for this project with Fire Alpaca using ship2 by Nabeeha as reference
+Who made it: Tony Imbesi
+
+File names: goal2.png, goal3.mdp
+What are they: unused concept art for goal sprite
+Where they come from: created for this project with Fire Alpaca using ship2 by Nabeeha as reference
+Who made it: Tony Imbesi
+
+File name: checkpoint.png
+What are they: sprites indicating an off-screen charging laser
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
