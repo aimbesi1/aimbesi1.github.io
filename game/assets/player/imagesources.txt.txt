@@ -1,0 +1,19 @@
+File name: dude
+What is it: a spritesheet for the main character
+Where it comes from: created for this project with Fire Alpaca using dude_backup3 as reference
+Who made it: Nicoletta Imbesi 
+
+File name: dude_backup3
+What is it: a spritesheet for the main character
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Tony Imbesi 
+
+File name: hurtSpritesheet
+What is it: a "hurt" animation for the main character
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Nabeeha Ashfaq
+
+File name: deathSpritesheet
+What is it: a "death" animation for the main character
+Where it comes from: created for this project with Fire Alpaca
+Who made it: Nabeeha Ashfaq
