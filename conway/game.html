@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel = "stylesheet" href = "game.css">
+<title>Conway's Game of Life</title>
+
+<script type="application/javascript">
+// This is an implementation of Conway's Game of Life inside an HTML canvas element.
+// Press SPACE to process one step in the game.
+// Code by Tony Imbesi, 4/16/2022
+
+const INTERVAL = 300;
+var useInterval = false;    // Set to true to run the game on a time interval
+
+let canvas;
+let ctx;
+let coords;
+let patternSelect;
+var MAXCOL = 30;         // dimension of the game board
+var MAXROW = 30;  
+var sideLength = 32; // Width and height of each sprite
+var CANVASWIDTH = MAXCOL * sideLength;
+var CANVASHEIGHT = MAXROW * sideLength;
+var borderThickness = 1; // Thickness of grid outlines in pixels
+
+
+let myInterval = null;
+
+var maxAge = 1;       
+var states = [];
+var world = [];
+var copy = [];
+var mouseX = 0;
+var mouseY = 0;
+var population = 0;
+var generation = 0;
+
+class Cell {
+    /**
+     * Constructs the sprite.
+     * @param {Number} x the initial x position
+     * @param {Number} y the initial y position
+     * @param {Number} w the width
+     * @param {Number} h the height
+     * @param {HTMLImageElement} img the image
+     * @param {Number} age the age of the cell
+     */
+    constructor (x, y, w, h, age) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+        this.rightEdge = this.x + this.width;
+        this.bottomEdge = this.y + this.height;
+        this.age = age;
+        this.color = this.updateColor();
+    }
+
+    /**
+     * Update the cell's color.
+     */
+    updateColor() {
+        if (this.age == 1) {
+            this.color = "#ffffff";
+        }
+        else {
+            this.color = "#000000";
+        }
+    }
+}
+
+function loadComplete() {
+    CANVASWIDTH = MAXCOL * sideLength;
+    CANVASHEIGHT = MAXROW * sideLength;
+    createCanvas();
+    console.log("Load is complete."); 
+    canvas = document.getElementById("theCanvas");
+    ctx = canvas.getContext("2d");
+    // coords = document.getElementById("coords");
+
+    // Begin modified code from http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
+    canvas.addEventListener('mousemove', function(evt) {
+        var mousePos = getMousePos(evt);
+        mouseX = mousePos.x;
+        mouseY = mousePos.y;
+        writeMessage(mouseX + ", " + mouseY);
+    });
+    canvas.addEventListener('click', function(evt) {
+        editCell();
+    })
+    resetWorld(false);
+    patternSelect = document.getElementById("pattern");
+    patternSelect.onchange = function() {
+        if (this.value == "block") {
+            document.getElementById("patternimg").src = "block.png";
+        }
+        if (this.value == "blinker") {
+            document.getElementById("patternimg").src = "blinker.gif";
+        }
+        if (this.value == "toad") {
+            document.getElementById("patternimg").src = "toad.gif";
+        }
+        if (this.value == "glider") {
+            document.getElementById("patternimg").src = "glider.gif";
+        }
+    }
+    // End modified code from http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
+    pageLoadComplete = true;
+    myInterval = self.setInterval(function(){check4all_loaded()}, 500);
+}
+
+
+
+
+
+
+var pageLoadComplete = false;
+var img_loaded = false;
+var boxes       = new Image();    // boxes
+boxes.src       = "BW.png";
+
+boxes.onload = function() {
+  img_loaded = true;
+}
+
+
+// Begin modified code from http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
+// function writeMessage(message) {
+//     coords.innerHTML = message;
+// }
+
+function getMousePos(evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
+}
+// End modified code from http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
+
+// This function is modified from https://www.w3schools.com/js/js_random.asp
+/**
+ * Gets a random integer in the range [min, max].
+ * @param min the minimum number
+ * @param max the maximum number
+ * @return the random integer
+ */
+ function getRand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Begin code modified from https://gamedev.cs.gsu.edu/~aimbesi1/hw10/platformer.html
+
+
+
+// Begin modified code from https://gamedev.cs.gsu.edu/~mweeks/Qbert_demo.html
+// Initialize the arrays of cells and states that represent the world.
+// If randomize is true, the world is populated with random cells.
+function resetWorld(randomize) {
+    stopGame();
+    states = [];
+    world = [];
+    population = 0;
+    generation = 0;
+    var rand = 0;
+    for (var r = 0; r < MAXROW; r++) {
+        for (var c = 0; c < MAXCOL; c++) {
+            if (randomize)
+                rand = getRand(0, maxAge);
+            states.push(rand);
+            var spr = new Cell(c * sideLength, r * sideLength, sideLength, sideLength, rand);
+            world.push(spr);
+            // console.log("Age added: " + states[states.length - 1]);
+            // console.log(spr.image.width);
+        }
+    }
+    updateWorld();
+    updateStats();
+}
+
+// End modified code from https://gamedev.cs.gsu.edu/~mweeks/Qbert_demo.html
+// End code modified from https://gamedev.cs.gsu.edu/~aimbesi1/hw10/platformer.html
+
+// Update each cell in the world with new age values and update the canvas graphics
+function updateWorld() {
+    eraseEverything();
+    population = 0;
+    for (var i = 0; i < world.length; i++) {
+        world[i].age = states[i];
+        world[i].updateColor();
+        population += states[i];
+        // console.log("Ages array:" + states[i]);
+    }
+    drawEverything();
+    // console.log('world update: ' + world[world.length - 1].age);
+}
+
+// Change the state of a cell by clicking on it.
+function editCell() {
+    var i = 0;
+    var found = false;
+    while (i < world.length && !found) {
+        // Check to see if the mouse's position is within the boundaries of a cell.
+        if (world[i].x <= mouseX && mouseX < world[i].rightEdge
+            && world[i].y <= mouseY && mouseY < world[i].bottomEdge) {
+            // Now change that cell's color.
+            if (world[i].age == 1) {
+                states[i] = 0;
+            }
+            else {
+                states[i] = 1;
+            }
+            found = true;
+        }
+        
+        i++;
+    }
+    // eraseEverything();
+    updateWorld();
+    updateStats();
+    // drawEverything();
+}
+
+// Place a pattern in the world.
+function placePattern() {
+    var shapeArray = [];
+    var rowsNeeded = 0;
+    var columnsNeeded = 0;
+    var value = document.getElementById('pattern').value;
+    // Determine the shape and rows and columns needed
+    if (value == "block") {
+        shapeArray =    [[1, 1],
+                         [1, 1]];
+        rowsNeeded = 2;
+        columnsNeeded = 2;
+    }
+    else if (value == "blinker") {
+        shapeArray =    [[1, 1, 1]];
+        rowsNeeded = 1;
+        columnsNeeded = 3;
+    }
+    else if (value == "toad") {
+        shapeArray =    [[0, 1, 1, 1],
+                         [1, 1, 1, 0]];
+        rowsNeeded = 2;
+        columnsNeeded = 4;
+    }
+    else if (value == "glider") {
+        shapeArray =    [[1, 0, 1],
+                         [0, 1, 1],
+                         [0, 1, 0]];
+        rowsNeeded = 3;
+        columnsNeeded = 3;
+    }
+    if (rowsNeeded > MAXROW || columnsNeeded > MAXCOL) {
+        return; // Impossible to place pattern
+    }
+    // Determine where to place the pattern
+    var rowToPlace = Math.max(0, Math.round((MAXROW - 1) / 2) - rowsNeeded);
+    var columnToPlace = Math.max(0, Math.round((MAXCOL - 1) / 2) - columnsNeeded);
+    // Place the pattern
+    for (var r = 0; r < rowsNeeded; r++) {
+        for (var c = 0; c < columnsNeeded; c++) {
+            states[(rowToPlace + r) * MAXCOL + (columnToPlace + c)] = shapeArray[r][c];
+            console.log((rowToPlace + r) * MAXCOL + (columnToPlace + c));
+        }
+    }
+    updateWorld();
+    updateStats();
+}
+
+// Update the world size.
+function changeWorldSize() {
+    eraseEverything();
+    resetWorld(false);
+    var width = document.getElementById('width').value;
+    var height = document.getElementById('height').value;
+    if (!(width == null || width == "")) {
+        MAXCOL = width;
+    }
+    if (!(height == null || height == "")) {
+        MAXROW = height;
+    }
+    loadComplete();
+}
+
+/**
+ * Use a copy of the states array to update each cell's age.
+ */
+function updateState() {
+    copy = [];
+    states.forEach(e => {
+        copy.push(e);
+    }); // Save a copy of the states array
+    var aliveNeighbors = 0;
+    for (var r = 0; r < MAXROW; r++) {
+      for (var c = 0; c < MAXCOL; c++) {
+        aliveNeighbors = 0;
+        console.log("(" + r + ", " + c + ")");
+        // Position of current cell's age: states[r * MAXROW + c]
+        // Count the number of alive neighbors
+        if (r > 0) {
+            // console.log("Checking upper row for row " + r + ", column " + c);
+            
+            if (c > 0 && getCellAt(r - 1, c - 1) > 0) {
+                aliveNeighbors++;
+                console.log("Top left: " + getCellAt(r - 1, c - 1));
+            }
+            
+            if (getCellAt(r - 1, c) > 0) {
+                aliveNeighbors++;
+                console.log("Top middle: " + getCellAt(r - 1, c));
+            }
+            
+            if (c < MAXCOL - 1 && getCellAt(r - 1, c + 1) > 0) {
+                aliveNeighbors++;
+                console.log("Top right: " + getCellAt(r - 1, c + 1));
+            }
+        }
+        // console.log("Checking middle row for row " + r + ", column " + c);
+        
+        if (c > 0 && getCellAt(r, c - 1) > 0) {
+            aliveNeighbors++;
+            console.log("Middle left: " + getCellAt(r, c - 1));
+        }
+    
+        if (c < MAXCOL - 1 && getCellAt(r, c + 1) > 0) {
+            aliveNeighbors++;
+            console.log("Middle right: " + getCellAt(r, c + 1));
+        }
+            
+        if (r < MAXROW - 1) {
+            // console.log("Checking lower row for row " + r + ", column " + c);
+            
+            if (c > 0 && getCellAt(r + 1, c - 1) > 0) {
+                aliveNeighbors++;
+                console.log("Bottom left: " + getCellAt(r + 1, c - 1));
+            }
+            
+            if (getCellAt(r + 1, c) > 0) {
+                aliveNeighbors++;
+                console.log("Bottom middle: " + getCellAt(r + 1, c));
+            }
+        
+            if (c < MAXCOL - 1 && getCellAt(r + 1, c + 1) > 0) {
+                aliveNeighbors++;
+                console.log("Bottom right: " + getCellAt(r + 1, c + 1));
+            }
+                
+        }
+        console.log("Total alive neighbors: " + aliveNeighbors);
+        // Now update the cell's state based on the number of alive neighbors
+        // Each cell with one or no neighbors dies
+        if (aliveNeighbors <= 1) {
+            states[r * MAXCOL + c] = 0;
+        }
+        // Each cell with two neighbors survives
+        else if (aliveNeighbors == 2) {
+            // Do nothing
+        }
+        // Each cell with three neighbors becomes populated / survives
+        else if (aliveNeighbors == 3) {
+            if (copy[r * MAXCOL + c] == 0) {
+                // console.log("Cell placed");
+                states[r * MAXCOL + c] = 1;
+            }
+            else {
+                // console.log("Age is not 0: no cell placed");
+            }
+        }
+        // Each cell with four or more neighbors dies
+        else if (4 <= aliveNeighbors) {
+            states[r * MAXCOL + c] = 0;
+        }
+        // Check one cell specifically for debugging
+        // if (r == MAXROW - 1 && c == MAXCOL - 1 ) {
+        //     console.log('states array: ' + states[states.length - 1]);
+        // }
+      }
+    }
+    // states array should have updated age values based on data from the copied array
+}
+
+function getCellAt(row, column) {
+    return copy[row * MAXCOL + column];
+}
+
+
+// Begin code modified from https://gamedev.cs.gsu.edu/~aimbesi1/hw10/platformer.html
+
+// Erase the entire canvas.
+function eraseEverything() {
+  ctx.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT);
+}
+
+function drawEverything() {
+    // draw tiles
+    var count = 0;
+    for (var i = 0; i < world.length; i++) {
+        ctx.fillStyle = world[i].color;
+        ctx.fillRect(world[i].x, world[i].y, sideLength, sideLength);
+        count++;
+    //   console.log("Drawing at row " + (world[i].y / sideLength) + ", column" + (world[i].x / sideLength));
+    //   console.log("Last sprite column: " + world[i].spriteCol);
+    //   console.log("Last sprite age: " + world[i].age);
+    //   console.log("Compare to: " + states[i]);
+    }
+    console.log(count + " vs. " + (MAXROW * MAXCOL));
+
+    // draw border
+    // Column lines
+    ctx.fillStyle = "#ffffff";
+    for (var c = 1; c < MAXCOL; c++) {
+        ctx.fillRect(c * sideLength, 0, borderThickness, CANVASHEIGHT);
+    }
+    // Row lines
+    for (var r = 1; r < MAXROW; r++) {
+        ctx.fillRect(0, r * sideLength, CANVASWIDTH, borderThickness);
+    }
+}
+
+function nextGeneration() {
+    // eraseEverything();
+    updateState();
+    updateWorld();
+    // drawEverything();
+    generation++;
+    updateStats();
+    // clearInterval(myInterval);
+}
+
+function nextGenerationIterate() {
+    for (var i = 0; i < 23; i++) {
+        nextGeneration();
+    }
+}
+
+function startGame() {
+    // Start a game interval
+    myInterval = self.setInterval(function(){nextGeneration()}, INTERVAL);
+}
+
+function stopGame() {
+    clearInterval(myInterval);
+}
+
+function updateStats() {
+    document.getElementById("population").innerHTML = "Current population: " + population;
+    document.getElementById("generation").innerHTML = "Generation: " + generation;
+}
+// End code modified from https://gamedev.cs.gsu.edu/~aimbesi1/hw10/platformer.html
+// whenKeyPressed function modified from HW 9 code
+function whenKeyPressed(key) {
+    switch (key) {
+        case " ":  //  upper-left
+            nextGeneration();
+        default:
+        // console.log(key);
+        break;
+    }
+}
+
+
+// Begin modified code from https://gamedev.cs.gsu.edu/~mweeks/parallax/platformer.html
+// Loading external resources is asynchronous. 
+// We cannot start until everything is loaded.
+// This function checks to see that everything loaded.
+function check4all_loaded() {
+  if (img_loaded && pageLoadComplete) {
+    // Everything has loaded.
+    // Stop the check-loaded interval
+    clearInterval(myInterval); // background color
+  }
+}
+// End modified code from https://gamedev.cs.gsu.edu/~mweeks/parallax/platformer.html
+
+// Begin code from HW 9
+document['onkeydown'] = function(event) {
+    event = event || window.event;
+
+    // event.which is deprecated
+    //var key = event.which || event.cursor;
+    //whenKeyPressed_old(key);
+
+    var key = event.key;  // This also works, and returns a string
+    whenKeyPressed(key);
+};
+// End code from HW 9
+
+function createCanvas() {
+    // Begin modified code from https://gamedev.cs.gsu.edu/~mweeks/parallax/platformer.html
+    document.getElementById('game').innerHTML = '<canvas id="theCanvas" tabindex="1" width="' + CANVASWIDTH
+    + '" height="' + CANVASHEIGHT + '"></canvas>';
+    // End modified code from https://gamedev.cs.gsu.edu/~mweeks/parallax/platformer.html
+}
+
+</script>
+
+</head>
+<body onload="loadComplete()" bgcolor="#ffffff" text="#000000">
+    <h1>Conway's Game Of Life!</h1>
+    <h2>By: <span style = color:blue>Tony Imbesi</span>, <span style = color:red>Cammeron Manning</span>, & <span style = color:purple>Daniel Wekesa</span></h2>
+<div id="game">
+
+</div>
+
+<!-- <p id="coords"></p> -->
+<div id="stats">
+    <p id="population">Current population:</p>
+    <p id="generation">Generation:</p>
+</div>
+<div class = "design">
+<div class = "buttons" id="options">
+    <button class = "button1" onclick="startGame()">Start game</button>
+    <button class = "button2" onclick="stopGame()">Stop game</button>
+    <button onclick="resetWorld(false)">Start over</button>
+    <button onclick="resetWorld(true)">Random world</button>
+    <div>
+        Pattern:
+        <select name="pattern" id="pattern">
+            <option value="" selected="selected">Select a pattern</option>
+            <option value="block">The Block</option>
+            <option value="blinker">The Blinker</option>
+            <option value="toad">The Toad</option>
+            <option value="glider">The Glider</option>
+        </select>
+        <button onclick="placePattern()">Place selected pattern</button>
+    </div>
+    <div>
+        Change world size:
+        <label>
+            Width: <input type="number" placeholder="30" id="width" min="1" max="50"/><br>
+            Height: <input type="number" placeholder="30" id="height" min="1" max="50"/>
+        </label>
+        <button onclick="changeWorldSize()">Reset world with new size</button>
+    </div>
+    <button onclick="nextGeneration()">+1 generation</button>
+    <button onclick="nextGenerationIterate()">+23 generations</button>
+</div>
+<img id="patternimg" src="">
+</div>
+</body>
+</html>

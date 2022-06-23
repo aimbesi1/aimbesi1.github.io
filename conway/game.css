@@ -1,0 +1,58 @@
+@import url('http://fonts.cdnfonts.com/css/rubber-biscuit');
+body{
+    text-align:center;
+    background-color:greenyellow;
+}
+h1{
+    font-family: 'Rubber Biscuit', sans-serif;
+                                                
+    color:brown;
+}
+h2{
+    font-family: 'Rubber Biscuit', sans-serif;
+    font-size:large;
+}
+.buttons{
+    color:blueviolet;
+    font-size:larger;
+                                                
+}
+button{
+    background-color:gold;
+    border: none;
+    color:black;
+    padding: 10px 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: large;
+    border-radius:6px;
+    border: 2px solid white;
+}
+.button1{
+    animation: button1 3s infinite;
+
+}
+.button2{
+    animation: button2 1.5s infinite;
+}
+p{
+    font-family: 'Rubber Biscuit', sans-serif;
+    color:black;
+    font-weight:900;                                            
+}
+.design{
+    background-color:rgba(255, 255, 255, 0.829);
+}
+@keyframes button1 {
+    0%   {background-color:yellow}
+    25%  {background-color:greenyellow}
+    50%  {background-color:green}
+    75%  {background-color:gold}
+    100% {background-color:yellow}
+  }
+  @keyframes button2 {
+      0% {background-color: red}
+      50% {background-color: gold}
+      1000% {background-color:red}
+  }
